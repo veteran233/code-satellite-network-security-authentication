@@ -61,10 +61,19 @@ public class CasMsg {
     }
 
     public byte[] getBytes() {
+
         return __innerByteArr;
     }
 
-    public byte[] get(String req) throws Exception {
+    public byte[] get(int startPos, int endPos) {
+
+        byte[] ret = new byte[endPos - startPos + 1];
+        System.arraycopy(__innerByteArr, startPos, ret, 0, endPos - startPos + 1);
+        return ret;
+    }
+
+    public byte[] get(String req) {
+
         byte[] ret = null;
         if (req == "T_TID") {
             ret = new byte[6];

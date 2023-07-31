@@ -5,12 +5,7 @@ import java.security.Key;
 public abstract class __GLOBAL__ {
 
     public static Key __ID__KEY__ = new Gen().genIdKey();
-    public static Key __MAIN__KEY__=new Gen().genMainKey();
-
-    public static void init() {
-        IdToAddr.add("LEO1", "127.0.101.114", 27114, 27115);
-        IdToAddr.add("GEO1", "127.0.110.114", 30114, 30115);
-    }
+    public static Key __MAIN__KEY__ = new Gen().genMainKey();
 }
 
 /*

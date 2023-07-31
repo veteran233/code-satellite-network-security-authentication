@@ -2,20 +2,22 @@ package com.example;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 
 public class Net {
 
     private class NetThread extends Thread {
+
         public void threadRecvMsg() throws Exception {
 
             // init receive data
-            final byte[] recvBytes = new byte[1024];
+            final byte[] recvBuf = new byte[256];
 
-            __recvDate = new DatagramPacket(recvBytes, recvBytes.length);
-            __recvSocket.receive(__recvDate);
+            __recvData = new DatagramPacket(recvBuf, recvBuf.length);
+            __socket.receive(__recvData);
 
-            byte[] retBytes = new byte[__recvDate.getLength()];
-            System.arraycopy(recvBytes, 0, retBytes, 0, __recvDate.getLength());
+            final byte[] retBytes = new byte[__recvData.getLength()];
+            System.arraycopy(recvBuf, 0, retBytes, 0, __recvData.getLength());
 
             // byte[] to CasMsg
             __recvMsg = new CasMsg(retBytes);
@@ -32,29 +34,25 @@ public class Net {
         }
     }
 
-    private DatagramSocket __sendSocket;
+    private DatagramSocket __socket;
     private DatagramPacket __sendData;
-    private DatagramSocket __recvSocket;
-    private DatagramPacket __recvDate;
+    private DatagramPacket __recvData;
 
     private NetThread __thread;
 
     private CasMsg __recvMsg;
 
-    public Net(final String id) throws Exception {
+    public Net() throws Exception {
 
         // init socket
-        __sendSocket = new DatagramSocket(IdToAddr.get(id).getSendPort(), IdToAddr.get(id).getAddr());
-        __recvSocket = new DatagramSocket(IdToAddr.get(id).getRecvPort(), IdToAddr.get(id).getAddr());
+        __socket = new DatagramSocket();
     }
 
-    public void sendMsg(final String id, final CasMsg msg) throws Exception {
+    public void sendMsg(final InetAddress destAddr, final int destPort, final CasMsg msg) throws Exception {
 
         // init send data
-        __sendData = new DatagramPacket(msg.getBytes(), msg.getBytes().length, IdToAddr.get(id).getAddr(),
-                IdToAddr.get(id).getRecvPort());
-
-        __sendSocket.send(__sendData);
+        __sendData = new DatagramPacket(msg.getBytes(), msg.getBytes().length, destAddr, destPort);
+        __socket.send(__sendData);
     }
 
     public void initRecv() {
@@ -65,7 +63,18 @@ public class Net {
     }
 
     public CasMsg recvMsg() throws Exception {
+
         __thread.join();
         return __recvMsg;
+    }
+
+    public InetAddress getAddr(){
+
+        return __recvData.getAddress();
+    }
+
+    public int getPort(){
+
+        return __recvData.getPort();
     }
 }
